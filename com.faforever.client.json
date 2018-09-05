@@ -1,0 +1,66 @@
+{
+  "app-id": "com.faforever.client",
+  "runtime": "org.kde.Platform",
+  "runtime-version": "5.11",
+  "sdk": "org.kde.Sdk",
+  "command": "python src",
+  "modules": [
+    {
+      "name": "fafclient",
+      "sources": [
+        {
+          "type": "archive",
+          "url": "https://github.com/FAForever/client/archive/0.18.1.tar.gz",
+          "sha256": "edc6d24f5339985541f015dea96b549e071344663cfc7d5d0a282faea5ca0920"
+        }
+      ],
+      "buildsystem": "simple",
+      "build-commands": [
+        "mkdir -p /app",
+        "FAFCLIENT_VERSION=0.18.1 python3 setup.py install --root=/app --optimize=1"
+      ],
+    "modules": [
+		{
+		  "name": "pyqt5",
+		  "config-opts": [ "--disable-static", "--enable-x11" ],
+		  "no-autogen": true,
+		  "buildsystem": "simple",
+		  "build-commands": [ 
+			"python3 configure.py --assume-shared --confirm-license --no-designer-plugin --no-qml-plugin --sysroot=/app -w --sip=/app/bin/sip --sip-incdir=/app/include -verbose QMAKE_CFLAGS_RELEASE='-I/usr/include/python3.5m/' QMAKE_CXXFLAGS_RELEASE='-I/usr/include/python3.5m/'", 
+			"make -j `nproc`",
+			"make install DESTDIR=/app"
+		  ],
+		  "sources": [
+			{
+			  "type": "archive",
+			  "url": "https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.11.2/PyQt5_gpl-5.11.2.tar.gz",
+			  "sha256": "7caa581155c3433716b7e6aba71fe1378cd7d92f4155c266d60e5cffb64e9603"
+			}
+		  ],
+		  "modules": [
+			{
+			  "name": "sip",
+			  "sources": [
+				{
+				  "type": "archive",
+				  "url": "https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.12/sip-4.19.12.tar.gz",
+				  "sha256": "24617fc31b983df075500ecac0e99d2fb48bf63ba82d4a17518659e571923822"
+				}
+			  ],
+			  "buildsystem": "simple",
+			  "build-commands": [
+				"python3 configure.py --bindir=/app/bin --destdir=/app/lib/python3.5/site-packages --incdir=/app/include --pyidir=/app/lib/python3.5/site-packages --sipdir=/app/share/sip",
+				"make",
+				"make install"
+			  ],
+			  "cleanup": [
+				"/bin",
+				"/include"
+			  ]
+			}
+		  ]
+		}
+	]
+}
+]
+}
