@@ -1,9 +1,18 @@
 {
   "app-id": "com.faforever.client",
-  "runtime": "org.kde.Platform",
-  "runtime-version": "5.11",
-  "sdk": "org.kde.Sdk",
-  "command": "python src",
+  "runtime": "org.kde.Platform/i386",
+  "runtime-version": "5.9",
+  "sdk": "org.kde.Sdk/i386",
+  "command": "fafclient",
+    "finish-args": [
+        "--share=ipc",
+        "--socket=x11",
+        "--socket=pulseaudio",
+        "--device=dri",        
+		"--allow=multiarch",
+        "--share=network",
+        "--filesystem=host"
+	],
   "modules": [
     {
       "name": "fafclient",
@@ -12,12 +21,29 @@
           "type": "archive",
           "url": "https://github.com/FAForever/client/archive/0.18.1.tar.gz",
           "sha256": "edc6d24f5339985541f015dea96b549e071344663cfc7d5d0a282faea5ca0920"
-        }
+        },
+        {
+          "type": "file",
+          "path": "fafclient.sh"
+		},
+        {
+          "type": "file",
+          "url": "https://github.com/FAForever/uid/releases/download/v4.0.5/faf-uid",
+          "sha256": "492022a0abad7c5b805dfa2b77505e9f535c6664b19f3efbccc3fbae4281e6f5"
+		}
       ],
       "buildsystem": "simple",
       "build-commands": [
         "mkdir -p /app",
-        "FAFCLIENT_VERSION=0.18.1 python3 setup.py install --root=/app --optimize=1"
+		"mkdir -p fafclient",
+		"mv src fafclient/src",
+		"echo 'import src' >> fafclient/__init__.py",
+        "FAFCLIENT_VERSION=0.18.1 python3 setup.py install --root=/app --optimize=1",
+		"cp -r res /app/usr/lib/python3.5/site-packages/fafclient",
+		"cp fafclient.sh /app/bin/fafclient",
+		"chmod +x faf-uid",
+		"cp faf-uid /app/bin/faf-uid",
+		"echo 0.18.1 > /app/usr/lib/python3.5/site-packages/fafclient/res/RELEASE-VERSION"
       ],
     "modules": [
 		{
@@ -32,9 +58,9 @@
 		  ],
 		  "sources": [
 			{
-			  "type": "archive",
-			  "url": "https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.11.2/PyQt5_gpl-5.11.2.tar.gz",
-			  "sha256": "7caa581155c3433716b7e6aba71fe1378cd7d92f4155c266d60e5cffb64e9603"
+          "type": "archive",
+          "url": "https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.9.2/PyQt5_gpl-5.9.2.tar.gz",
+"sha256": "c190dac598c97b0113ca5e7a37c71c623f02d1d713088addfacac4acfa4b8394"
 			}
 		  ],
 		  "modules": [
@@ -42,9 +68,9 @@
 			  "name": "sip",
 			  "sources": [
 				{
-				  "type": "archive",
-				  "url": "https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.12/sip-4.19.12.tar.gz",
-				  "sha256": "24617fc31b983df075500ecac0e99d2fb48bf63ba82d4a17518659e571923822"
+              "type": "archive",
+              "url": "https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.7/sip-4.19.7.tar.gz",
+"sha256": "25b50d29dd4b72965e7980c41e3320e460eff481a177beeddebf8c3be84b8cde"
 				}
 			  ],
 			  "buildsystem": "simple",
@@ -59,7 +85,180 @@
 			  ]
 			}
 		  ]
-		}
+		},
+		{
+		  "name": "python-semantic_version",
+		  "no-autogen": true,
+		  "buildsystem": "simple",
+		  "build-commands": [ 
+			"python3 setup.py install --prefix=/app --optimize=1"
+		  ],
+		  "sources": [
+			{
+          "type": "archive",
+          "url": "https://github.com/rbarrois/python-semanticversion/archive/v2.6.0.tar.gz",
+"sha256": "110d9c75dc9670a188ab820503c6b40ea4ab3f1450a0aee5a90a24fd60aef358"
+			}
+		  ]
+		},
+		{
+		  "name": "python-jsonschema",
+		  "no-autogen": true,
+		  "buildsystem": "simple",
+			"ensure-writable": [
+				"/lib/python3.5/site-packages/easy-install.pth",
+				"/lib/python3.5/site-packages/setuptools.pth"
+			],
+		  "build-commands": [ 
+			"python3 setup.py install --prefix=/app --optimize=1"
+		  ],
+		  "sources": [
+			{
+          "type": "archive",
+          "url": "https://files.pythonhosted.org/packages/58/b9/171dbb07e18c6346090a37f03c7e74410a1a56123f847efed59af260a298/jsonschema-2.6.0.tar.gz",
+"sha256": "6ff5f3180870836cae40f06fa10419f557208175f13ad7bc26caa77beb1f6e02"
+			}
+		  ],
+		  "modules": [
+			{
+			  "name": "python-vcversioner",
+			  "sources": [
+				{
+              "type": "archive",
+              "url": "https://files.pythonhosted.org/packages/c5/cc/33162c0a7b28a4d8c83da07bc2b12cee58c120b4a9e8bba31c41c8d35a16/vcversioner-2.16.0.0.tar.gz",
+"sha256": "dae60c17a479781f44a4010701833f1829140b1eeccd258762a74974aa06e19b"
+				}
+			  ],
+			  "buildsystem": "simple",
+			"ensure-writable": [
+				"/lib/python3.5/site-packages/easy-install.pth",
+				"/lib/python3.5/site-packages/setuptools.pth"
+			],
+			  "build-commands": [
+			"python3 setup.py install --prefix=/app --optimize=1"
+			  ]
+			}
+		  ]	
+		  
+	  },
+		{
+		  "name": "python-jinja2",
+		  "no-autogen": true,
+		  "buildsystem": "simple",
+			"ensure-writable": [
+				"/lib/python3.5/site-packages/easy-install.pth",
+				"/lib/python3.5/site-packages/setuptools.pth"
+			],
+		  "build-commands": [ 
+			"python3 setup.py install --prefix=/app --optimize=1"
+		  ],
+		  "sources": [
+			{
+          "type": "archive",
+          "url": "https://github.com/pallets/jinja/archive/2.8.tar.gz",
+"sha256": "e270c55a2736f39eee67daba60be64fe0790ccdbbc47cdcc3ebda3017981081f"
+			}
+		  ],
+		  "modules": [
+			{
+			  "name": "python-MarkupSafe",
+			  "sources": [
+				{
+              "type": "archive",
+              "url": "https://files.pythonhosted.org/packages/4d/de/32d741db316d8fdb7680822dd37001ef7a448255de9699ab4bfcbdf4172b/MarkupSafe-1.0.tar.gz",
+"sha256": "a6be69091dac236ea9c6bc7d012beab42010fa914c459791d627dad4910eb665"
+				}
+			  ],
+			  "buildsystem": "simple",
+			"ensure-writable": [
+				"/lib/python3.5/site-packages/easy-install.pth",
+				"/lib/python3.5/site-packages/setuptools.pth"
+			],
+			  "build-commands": [
+			"python3 setup.py install --prefix=/app --optimize=1"
+			  ]
+			}
+		  ]		  
+		},
+        {
+            "name": "wine",
+            "build-options": {
+                "make-args": [ "--silent" ] 
+            },
+            "config-opts": [
+                "--libdir=/app/lib",
+                "--disable-win16",
+                "--with-x",
+                "--without-cups",
+                "--without-curses",
+                "--without-capi",
+                "--without-glu",
+                "--without-gphoto",
+                "--without-gsm",
+                "--without-hal",
+                "--without-ldap",
+                "--without-netapi"
+            ],
+            "cleanup": [
+                "/bin/function_grep.pl",
+                "/bin/msiexec",
+                "/bin/widl",
+                "/bin/wine64-preloader",
+                "/bin/winebuild",
+                "/bin/wineconsole",
+                "/bin/winedbg",
+                "/bin/winefile",
+                "/bin/winegcc",
+                "/bin/winemine",
+                "/bin/wrc",
+                "/bin/msidb",
+                "/bin/notepad",
+                "/bin/regsvr32",
+                "/bin/wineboot",
+                "/bin/winecfg",
+                "/bin/winecpp",
+                "/bin/winedump",
+                "/bin/wineg++",
+                "/bin/winemaker",
+                "/bin/winepath",
+                "/bin/wmc",
+                "/include",
+                "/share/man",
+                "/share/applications"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://dl.winehq.org/wine/source/3.x/wine-3.8.tar.xz",
+                    "sha256": "02b00c6c948b3bab717e1b1e2075a5406b14d138bd2e01fdb1268a93d1c20d51"
+                },
+                {
+                    "type": "archive",
+                    "url": "https://github.com/wine-staging/wine-staging/archive/v3.8.tar.gz",
+                    "sha256": "fd40c24e00b3da4498f78885a5d3c4a9699790c1de78f6e43ff151432824f2ad"
+                },
+                {
+                    "type": "shell",
+                    "commands": [ "./patches/patchinstall.sh DESTDIR=$(pwd) --all" ]
+                }
+            ]
+        },
+        {
+            "name": "winetricks",
+            "buildsystem": "simple",
+            "build-commands": [
+              "make",
+              "make PREFIX=/app install",
+              "chmod +x /app/bin/winetricks"
+            ],
+            "sources": [
+                {
+                    "type": "archive",
+                    "url": "https://github.com/Winetricks/winetricks/archive/20180513.tar.gz",
+                    "sha256": "626aff64e3d93698704b0b668225d5504fd8ef556e3834f569058deaeafada8e"
+                }
+            ]
+}
 	]
 }
 ]
